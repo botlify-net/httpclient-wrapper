@@ -47,7 +47,7 @@ public class HttpClientWrapper {
      * @return The brightdata username property set.
      */
     public static String getBrightDataUsername() {
-        return (System.getProperty("httpClientWrapperBrightDataUser"));
+        return (System.getProperty("httpClientWrapperBrightDataUsername"));
     }
 
     /**

@@ -224,7 +224,7 @@ public class HttpClientSessionBasic {
      */
     public JSONObject getIpInformation() throws HttpClientException, IOException, HttpServerException {
         RequestResponse requestResponse = sendGet("https://lumtest.com/echo.json");
-        return (requestResponse.getJsonResponse());
+        return (requestResponse.toJSONObject());
     }
 
     public String getUserAgent() {

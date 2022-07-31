@@ -3,6 +3,7 @@ package net.httpclient.wrapper.response;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -55,8 +56,12 @@ public class RequestResponse {
         return (rawResponse);
     }
 
-    public JSONObject getJsonResponse() {
+    public JSONObject toJSONObject() {
         return (new JSONObject(rawResponse));
+    }
+
+    public JSONArray toJSONArray() {
+        return (new JSONArray(rawResponse));
     }
 
     public long getTime() {

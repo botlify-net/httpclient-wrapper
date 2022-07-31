@@ -15,7 +15,7 @@ make finstall
 
 ## Configure proxy
 
-You client can be used with [brightData](brightdata.com) proxy.
+Your client can be used with [brightData](brightdata.com) proxy.
 If you want to use this proxy, you have to configure it.
 
 ```java

@@ -2,17 +2,17 @@ package net.httpclient.wrapper.exception;
 
 import org.apache.http.HttpResponse;
 
-class HttpException extends Exception {
+public class HttpException extends Exception {
 
     private final HttpResponse httpResponse;
 
     public HttpException(HttpResponse httpResponse) {
-        super("http request return status code : " + httpResponse.getStatusLine().getStatusCode());
+        super("Http request return status code : " + httpResponse.getStatusLine().getStatusCode());
         this.httpResponse = httpResponse;
     }
 
     public HttpResponse getHttpResponse() {
-        return httpResponse;
+        return (httpResponse);
     }
 
     public int getStatusCode() {
