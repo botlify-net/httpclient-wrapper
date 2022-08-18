@@ -78,6 +78,7 @@ public class HttpClientSessionBasic {
 
     public void resetHttpClient() {
         try {
+            this.httpCookieStore.clear();
             this.httpClient = newHttpClient();
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
             throw new RuntimeException(e);
@@ -124,7 +125,7 @@ public class HttpClientSessionBasic {
         httpGet.setConfig(getRequestConfig().build());
         httpGet.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         HttpResponse httpResponse = getHttpClient().execute(httpGet);
-        assertRequest(httpResponse);
+        assertRequest(httpResponse, start);
         return (new RequestResponse(httpResponse, start));
     }
 
@@ -136,7 +137,7 @@ public class HttpClientSessionBasic {
         httpPost.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         httpPost.setEntity(new StringEntity(content));
         HttpResponse httpResponse = getHttpClient().execute(httpPost);
-        assertRequest(httpResponse);
+        assertRequest(httpResponse, start);
         return (new RequestResponse(httpResponse, start));
     }
 
@@ -148,7 +149,7 @@ public class HttpClientSessionBasic {
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, Consts.UTF_8);
         httpPost.setEntity(entity);
         HttpResponse httpResponse = httpClient.execute(httpPost);
-        assertRequest(httpResponse);
+        assertRequest(httpResponse, start);
         return (new RequestResponse(httpResponse, start));
     }
 
@@ -158,7 +159,7 @@ public class HttpClientSessionBasic {
         httpDelete.setConfig(getRequestConfig().build());
         httpDelete.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         HttpResponse httpResponse = httpClient.execute(httpDelete);
-        assertRequest(httpResponse);
+        assertRequest(httpResponse, start);
         return (new RequestResponse(httpResponse, start));
     }
 
@@ -170,16 +171,16 @@ public class HttpClientSessionBasic {
         httpPut.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         httpPut.setEntity(new StringEntity(content));
         HttpResponse httpResponse = getHttpClient().execute(httpPut);
-        assertRequest(httpResponse);
+        assertRequest(httpResponse, start);
         return (new RequestResponse(httpResponse, start));
     }
 
-    private void assertRequest(HttpResponse httpResponse) throws HttpClientException, HttpServerException {
+    private void assertRequest(HttpResponse httpResponse, Date startDate) throws HttpClientException, HttpServerException, IOException {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         if (statusCode >= 500 && statusCode <= 599)
-            throw new HttpServerException(httpResponse);
+            throw new HttpServerException(new RequestResponse(httpResponse, startDate));
         else if (statusCode >= 400 && statusCode <= 499)
-            throw new HttpClientException(httpResponse);
+            throw new HttpClientException(new RequestResponse(httpResponse, startDate));
     }
 
     /*

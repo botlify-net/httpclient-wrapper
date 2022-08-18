@@ -1,22 +1,21 @@
 package net.httpclient.wrapper.exception;
 
+import net.httpclient.wrapper.response.RequestResponse;
 import org.apache.http.HttpResponse;
+
+import java.io.IOException;
 
 public class HttpException extends Exception {
 
-    private final HttpResponse httpResponse;
+    private final RequestResponse requestResponse;
 
-    public HttpException(HttpResponse httpResponse) {
-        super("Http request return status code : " + httpResponse.getStatusLine().getStatusCode());
-        this.httpResponse = httpResponse;
+    public HttpException(RequestResponse requestResponse) {
+        super("Http request return status code : " + requestResponse.getStatusCode());
+        this.requestResponse = requestResponse;
     }
 
-    public HttpResponse getHttpResponse() {
-        return (httpResponse);
-    }
-
-    public int getStatusCode() {
-        return (getHttpResponse().getStatusLine().getStatusCode());
+    public RequestResponse getRequestResponse() throws IOException {
+        return (requestResponse);
     }
 
 }
