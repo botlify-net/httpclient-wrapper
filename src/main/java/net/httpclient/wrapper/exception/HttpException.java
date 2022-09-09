@@ -1,9 +1,6 @@
 package net.httpclient.wrapper.exception;
 
 import net.httpclient.wrapper.response.RequestResponse;
-import org.apache.http.HttpResponse;
-
-import java.io.IOException;
 
 public class HttpException extends Exception {
 
@@ -14,7 +11,7 @@ public class HttpException extends Exception {
         this.requestResponse = requestResponse;
     }
 
-    public RequestResponse getRequestResponse() throws IOException {
+    public RequestResponse getRequestResponse() {
         return (requestResponse);
     }
 

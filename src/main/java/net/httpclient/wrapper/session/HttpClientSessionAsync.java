@@ -32,7 +32,7 @@ import java.util.concurrent.Semaphore;
 
 import static net.httpclient.wrapper.HttpClientWrapper.logger;
 
-public class HttpClientSessionAsync extends HttpClientSessionBasic {
+public class HttpClientSessionAsync extends HttpClientSession {
 
     /*
      $      Variable of the class

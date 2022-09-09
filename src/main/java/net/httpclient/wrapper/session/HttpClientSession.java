@@ -1,9 +1,11 @@
 package net.httpclient.wrapper.session;
 
 import net.httpclient.wrapper.HttpClientWrapper;
+import net.httpclient.wrapper.events.HttpClientSessionEvent;
 import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
 import net.httpclient.wrapper.response.RequestResponse;
+import net.httpclient.wrapper.utils.BasicCookieStoreSerializerUtils;
 import net.httpclient.wrapper.utils.RandomUserAgent;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
@@ -36,11 +38,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static net.httpclient.wrapper.HttpClientWrapper.logger;
+
 /**
  * The basic class for all the http requests.
  * No security for multithreaded application.
  */
-public class HttpClientSessionBasic {
+public class HttpClientSession {
 
     /*
      $      Variable of the class
@@ -57,7 +61,7 @@ public class HttpClientSessionBasic {
      $      Constructor
      */
 
-    public HttpClientSessionBasic() {
+    public HttpClientSession() {
         try {
             this.httpClient = newHttpClient();
             this.requestConfig = setRequestConfig();
@@ -121,66 +125,115 @@ public class HttpClientSessionBasic {
 
     public RequestResponse sendGet(String url) throws IOException, HttpClientException, HttpServerException {
         Date start = new Date();
+        String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
+
         HttpGet httpGet = new HttpGet(url);
         httpGet.setConfig(getRequestConfig().build());
         httpGet.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         HttpResponse httpResponse = getHttpClient().execute(httpGet);
+
         assertRequest(httpResponse, start);
+        verifyCookiesEvents(oldCookieStoreSerialized);
         return (new RequestResponse(httpResponse, start));
     }
 
     public RequestResponse sendPost(String url, String content, ContentType contentType) throws IOException, HttpClientException, HttpServerException {
         Date start = new Date();
+        String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
+
         HttpPost httpPost = new HttpPost(url);
         httpPost.setConfig(getRequestConfig().build());
         httpPost.addHeader(HttpHeaders.CONTENT_TYPE, contentType.getMimeType());
         httpPost.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         httpPost.setEntity(new StringEntity(content));
         HttpResponse httpResponse = getHttpClient().execute(httpPost);
+
         assertRequest(httpResponse, start);
+        verifyCookiesEvents(oldCookieStoreSerialized);
         return (new RequestResponse(httpResponse, start));
     }
 
     public RequestResponse sendForm(String url, List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException {
         Date start = new Date();
+        String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
+
         HttpPost httpPost = new HttpPost(url);
         httpPost.setConfig(getRequestConfig().build());
         httpPost.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, Consts.UTF_8);
         httpPost.setEntity(entity);
         HttpResponse httpResponse = httpClient.execute(httpPost);
+
         assertRequest(httpResponse, start);
+        verifyCookiesEvents(oldCookieStoreSerialized);
         return (new RequestResponse(httpResponse, start));
     }
 
     public RequestResponse sendDelete(String url) throws IOException, HttpClientException, HttpServerException {
         Date start = new Date();
+        String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
+
         HttpDelete httpDelete = new HttpDelete(url);
         httpDelete.setConfig(getRequestConfig().build());
         httpDelete.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         HttpResponse httpResponse = httpClient.execute(httpDelete);
+
         assertRequest(httpResponse, start);
+        verifyCookiesEvents(oldCookieStoreSerialized);
         return (new RequestResponse(httpResponse, start));
     }
 
     public RequestResponse sendPut(String url, String content, ContentType contentType) throws IOException, HttpClientException, HttpServerException {
         Date start = new Date();
+        String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
+
         HttpPut httpPut = new HttpPut(url);
         httpPut.setConfig(getRequestConfig().build());
         httpPut.addHeader(HttpHeaders.CONTENT_TYPE, contentType.getMimeType());
         httpPut.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         httpPut.setEntity(new StringEntity(content));
         HttpResponse httpResponse = getHttpClient().execute(httpPut);
+
         assertRequest(httpResponse, start);
+        verifyCookiesEvents(oldCookieStoreSerialized);
         return (new RequestResponse(httpResponse, start));
     }
 
+    /*
+     $      Private mehtods
+     */
+
+    /**
+     * Assert the request and throw an exception if the request is not valid.
+     * @param httpResponse The response of the request.
+     * @param startDate The start date of the request.
+     * @throws HttpClientException If the request is not successful.
+     * @throws HttpServerException If the server is not available.
+     * @throws IOException If the request is not successful because of an network error.
+     */
     private void assertRequest(HttpResponse httpResponse, Date startDate) throws HttpClientException, HttpServerException, IOException {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         if (statusCode >= 500 && statusCode <= 599)
             throw new HttpServerException(new RequestResponse(httpResponse, startDate));
         else if (statusCode >= 400 && statusCode <= 499)
             throw new HttpClientException(new RequestResponse(httpResponse, startDate));
+    }
+
+    /**
+     * Verify if the cookie store has been modified.
+     * Some requests can modify the cookie store, and this method will verify if the cookie store has been modified.
+     * This methods can trigger HttpClientCookiesUpdatedEvent.
+     * This methods should be called after a request.
+     * @param serializedOldCookieStore The old cookie store before the request serialized as string.
+     */
+    private void verifyCookiesEvents(String serializedOldCookieStore) {
+        try {
+            String serializedNewCookieStore = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
+            if (!serializedOldCookieStore.equals(serializedNewCookieStore))
+                HttpClientSessionEvent.triggerHttpClientCookiesUpdated(this);
+        } catch (Exception e) {
+            logger.warn("Error while verifying cookies events", e);
+        }
     }
 
     /*

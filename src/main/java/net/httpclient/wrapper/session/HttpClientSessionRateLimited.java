@@ -10,7 +10,7 @@ import org.apache.http.entity.ContentType;
 import java.io.IOException;
 import java.util.List;
 
-public class HttpClientSessionRateLimited extends HttpClientSessionBasic {
+public class HttpClientSessionRateLimited extends HttpClientSession {
 
     private final RateLimiter rateLimiter;
 
