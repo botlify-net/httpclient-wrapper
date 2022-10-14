@@ -54,6 +54,7 @@ public class HttpClientSession {
     protected final BasicCookieStore httpCookieStore = new BasicCookieStore();
     protected RequestConfig.Builder requestConfig;
     protected String userAgent = RandomUserAgent.getRandomUserAgent();
+    protected Object metadata = null;
 
     private final long TIMEOUT = TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
 
@@ -227,6 +228,8 @@ public class HttpClientSession {
      * @param serializedOldCookieStore The old cookie store before the request serialized as string.
      */
     private void verifyCookiesEvents(String serializedOldCookieStore) {
+        if (HttpClientSessionEvent.getHttpClientSessionListeners().size() == 0)
+            return;
         try {
             String serializedNewCookieStore = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
             if (!serializedOldCookieStore.equals(serializedNewCookieStore))
@@ -289,4 +292,11 @@ public class HttpClientSession {
         this.userAgent = userAgent;
     }
 
+    public Object getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Object metadata) {
+        this.metadata = metadata;
+    }
 }

@@ -3,6 +3,7 @@ package net.httpclient.wrapper.events;
 import net.httpclient.wrapper.session.HttpClientSession;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This static class manage the HttpClientSession events.
@@ -20,7 +21,9 @@ public class HttpClientSessionEvent {
      * @param listener The listener to add.
      */
     public static void addHttpClientSessionListener(HttpClientSessionListener listener) {
-        httpClientSessionBasics.add(listener);
+        synchronized (httpClientSessionBasics) {
+            httpClientSessionBasics.add(listener);
+        }
     }
 
     /**
@@ -28,7 +31,9 @@ public class HttpClientSessionEvent {
      * @param listener The listener to remove.
      */
     public static void removeHttpClientSessionListener(HttpClientSessionListener listener) {
-        httpClientSessionBasics.remove(listener);
+        synchronized (httpClientSessionBasics) {
+            httpClientSessionBasics.remove(listener);
+        }
     }
 
     /*
@@ -40,8 +45,24 @@ public class HttpClientSessionEvent {
      * @param httpClientSession The HttpClientSession who has updated his cookies.
      */
     public static void triggerHttpClientCookiesUpdated(HttpClientSession httpClientSession) {
-        httpClientSessionBasics.forEach(listener -> listener.onHttpClientCookiesUpdated(httpClientSession));
+        synchronized (httpClientSessionBasics) {
+            httpClientSessionBasics.forEach(listener -> listener.onHttpClientCookiesUpdated(httpClientSession));
+        }
     }
 
+
+    /*
+     $      Getters
+     */
+
+    /**
+     * This method return a list copy of the listeners.
+     * @return A list copy of the listeners.
+     */
+    public static List<HttpClientSessionListener> getHttpClientSessionListeners() {
+        synchronized (httpClientSessionBasics) {
+            return new ArrayList<>(httpClientSessionBasics);
+        }
+    }
 
 }

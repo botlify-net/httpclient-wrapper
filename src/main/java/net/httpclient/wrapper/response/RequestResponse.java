@@ -57,11 +57,19 @@ public class RequestResponse {
     }
 
     public JSONObject toJSONObject() {
-        return (new JSONObject(rawResponse));
+        try {
+            return (new JSONObject(rawResponse));
+        } catch (Exception e) {
+            return (null);
+        }
     }
 
     public JSONArray toJSONArray() {
-        return (new JSONArray(rawResponse));
+        try {
+            return (new JSONArray(rawResponse));
+        } catch (Exception e) {
+            return (null);
+        }
     }
 
     public long getTime() {

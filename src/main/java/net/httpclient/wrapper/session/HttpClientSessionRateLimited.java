@@ -1,13 +1,14 @@
 package net.httpclient.wrapper.session;
 
-import com.google.common.util.concurrent.RateLimiter;
 import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
+import net.httpclient.wrapper.ratelimiter.RateLimiter;
 import net.httpclient.wrapper.response.RequestResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.entity.ContentType;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 
 public class HttpClientSessionRateLimited extends HttpClientSession {
@@ -20,7 +21,7 @@ public class HttpClientSessionRateLimited extends HttpClientSession {
 
     public HttpClientSessionRateLimited(double permitsPerSecond) {
         super();
-        rateLimiter = RateLimiter.create(permitsPerSecond);
+        rateLimiter = new RateLimiter(Duration.ofSeconds((int)permitsPerSecond));
     }
 
     @Override
