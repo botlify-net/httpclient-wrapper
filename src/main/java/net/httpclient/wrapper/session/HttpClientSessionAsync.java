@@ -45,8 +45,12 @@ public class HttpClientSessionAsync extends HttpClientSession {
      $      Constructor
      */
 
+    /**
+     * Create a new session with a default number of simultaneous requests
+     * set to <b>1</b>.
+     */
     public HttpClientSessionAsync() {
-        this(3);
+        this(1);
     }
 
     public HttpClientSessionAsync(int maxSynchronousRequest) {

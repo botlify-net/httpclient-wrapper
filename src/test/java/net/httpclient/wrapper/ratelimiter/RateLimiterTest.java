@@ -17,9 +17,15 @@ class RateLimiterTest {
 
     @Test
     public void acquireTest() {
-        RateLimiter rateLimiter = new RateLimiter(Duration.ofSeconds(1));
+        int timeSec = 3;
+        RateLimiter rateLimiter = new RateLimiter(Duration.ofSeconds(timeSec));
+        System.out.println("Start acquire test: " + Instant.now());
         assertDoesNotThrow(() -> rateLimiter.acquire());
+        System.out.println("Waiting " + timeSec + " second: " + Instant.now());
         assertDoesNotThrow(() -> rateLimiter.acquire());
+        System.out.println("Waiting " + timeSec + " second: " + Instant.now());
+        assertDoesNotThrow(() -> rateLimiter.acquire());
+        System.out.println("End of test: " + Instant.now());
     }
 
     @Test
@@ -27,9 +33,18 @@ class RateLimiterTest {
         int durationInSeconds = 3;
         RateLimiter rateLimiter = new RateLimiter(Duration.ofSeconds(durationInSeconds));
         rateLimiter.acquire();
-        assertEquals(durationInSeconds, rateLimiter.getRemainingTime().toSeconds());
+        assertEquals(durationInSeconds - 1, rateLimiter.getRemainingDuration().toSeconds());
         rateLimiter.reset();
-        assertEquals(Duration.ZERO, rateLimiter.getRemainingTime());
+        assertEquals(Duration.ZERO, rateLimiter.getRemainingDuration());
+    }
+
+    @Test
+    public void testChangeDuration() {
+        int durationInSeconds = 1;
+        RateLimiter rateLimiter = new RateLimiter(Duration.ofSeconds(durationInSeconds));
+        rateLimiter.acquire();
+        rateLimiter.setDuration(Duration.ofSeconds(2));
+        assertEquals(2, rateLimiter.getDuration().toSeconds());
     }
 
 }

@@ -77,4 +77,9 @@ public class RequestResponse {
             return (-1);
         return (end.getTime() - start.getTime());
     }
+
+    public String getReasonPhrase() {
+        return (httpResponse.getStatusLine().getReasonPhrase());
+    }
+
 }

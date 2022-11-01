@@ -6,6 +6,7 @@ import net.httpclient.wrapper.ratelimiter.RateLimiter;
 import net.httpclient.wrapper.response.RequestResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.entity.ContentType;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -16,12 +17,12 @@ public class HttpClientSessionRateLimited extends HttpClientSession {
     private final RateLimiter rateLimiter;
 
     public HttpClientSessionRateLimited() {
-        this(1.0);
+        this(Duration.ofSeconds(1));
     }
 
-    public HttpClientSessionRateLimited(double permitsPerSecond) {
+    public HttpClientSessionRateLimited(@NotNull Duration duration) {
         super();
-        rateLimiter = new RateLimiter(Duration.ofSeconds((int)permitsPerSecond));
+        rateLimiter = new RateLimiter(duration);
     }
 
     @Override
@@ -108,4 +109,11 @@ public class HttpClientSessionRateLimited extends HttpClientSession {
         return (super.sendForm(url, form));
     }
 
+    /*
+     $      Getters
+     */
+
+    public RateLimiter getRateLimiter() {
+        return rateLimiter;
+    }
 }

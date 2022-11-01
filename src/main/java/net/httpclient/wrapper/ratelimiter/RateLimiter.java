@@ -1,5 +1,7 @@
 package net.httpclient.wrapper.ratelimiter;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,7 +10,10 @@ import java.time.Instant;
 
 public class RateLimiter {
 
+    @Getter @Setter @NotNull
     private Duration duration;
+
+    @Getter @Setter @Nullable
     private Instant lastAcquire;
 
     /*
@@ -26,25 +31,18 @@ public class RateLimiter {
     /**
      * Sleep until the duration is passed.
      */
-    public void acquire() {
-        synchronized (this) {
-            try {
-                dangerousAcquire();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void dangerousAcquire() throws InterruptedException {
-        synchronized (this) {
+    public synchronized void acquire() {
+        try {
             if (lastAcquire == null) {
                 lastAcquire = Instant.now();
                 return;
             }
-            Duration durationToSleep = getRemainingTime();
-            if (durationToSleep.isZero()) Thread.sleep(durationToSleep.toMillis());
+            Duration durationToSleep = getRemainingDuration();
+            if (!durationToSleep.isZero() && !durationToSleep.isNegative())
+                Thread.sleep(durationToSleep.toMillis());
             lastAcquire = Instant.now();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -56,31 +54,16 @@ public class RateLimiter {
     }
 
     /**
-     * Get the remaining time before the next acquire.
-     * @return The remaining time in milliseconds.
+     * Get the time to wait before executing the next acquire.
+     * @return The time to wait in Duration.
      */
-    public @NotNull Duration getRemainingTime() {
-        if (lastAcquire == null) return Duration.ZERO;
-        long lastRequest = lastAcquire.toEpochMilli();
-        long now = Instant.now().toEpochMilli();
-        long result = lastRequest + duration.toMillis() - now;
-        return (result > 0) ? Duration.ofMillis(result) : Duration.ZERO;
-    }
-
-    /*
-     $      Getters
-     */
-
-    public @NotNull Duration getDuration() {
-        return duration;
-    }
-
-    public @Nullable Instant getLastAcquire() {
-        return lastAcquire;
-    }
-
-    public void setDuration(@NotNull Duration duration) {
-        this.duration = duration;
+    public @NotNull Duration getRemainingDuration() {
+        if (lastAcquire == null) return (Duration.ZERO);
+        if (duration.isZero()) return (Duration.ZERO);
+        Instant now = Instant.now();
+        Instant timeToExec = lastAcquire.plus(duration);
+        if (timeToExec.isBefore(now)) return (Duration.ZERO);
+        return (Duration.between(now, timeToExec));
     }
 
 }
