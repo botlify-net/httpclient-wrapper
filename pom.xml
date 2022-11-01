@@ -17,9 +17,9 @@
         </dependency>
         <!-- Apache Httpclient -->
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2-beta1</version>
         </dependency>
         <!-- Json -->
         <dependency>
