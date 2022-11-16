@@ -26,7 +26,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import javax.net.ssl.SSLContext;
@@ -95,6 +97,13 @@ public class HttpClientSession {
         httpClientBuilder.setUserAgent(userAgent);
 
         /*
+         * This line below allow redirection (301, 302, 303, 307, 308) to be followed automatically
+         * in the case of a POST request. By default, the HttpClient does not follow redirections for POST requests.
+         * This is specified in the HTTP specification. (HTTP RFC 2616)
+         */
+        httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy());
+
+        /*
          * Create a SSLContext that uses our Trust Strategy to trust all self-signed certificates.
          */
         SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
@@ -124,12 +133,22 @@ public class HttpClientSession {
         return (httpClientBuilder.build());
     }
 
-    public RequestResponse sendGet(String url) throws IOException, HttpClientException, HttpServerException {
+    /*
+     $      GET
+     */
+
+    public @NotNull RequestResponse sendGet(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
+        return (sendGet(url, getRequestConfig().build()));
+    }
+
+    public @NotNull RequestResponse sendGet(@NotNull String url, @NotNull RequestConfig requestConfig) throws IOException,
+            HttpClientException,
+            HttpServerException {
         Date start = new Date();
         String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
 
         HttpGet httpGet = new HttpGet(url);
-        httpGet.setConfig(getRequestConfig().build());
+        httpGet.setConfig(requestConfig);
         httpGet.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         HttpResponse httpResponse = getHttpClient().execute(httpGet);
 
@@ -137,6 +156,10 @@ public class HttpClientSession {
         verifyCookiesEvents(oldCookieStoreSerialized);
         return (new RequestResponse(httpResponse, start));
     }
+
+    /*
+     $      POST
+     */
 
     public RequestResponse sendPost(String url, String content, ContentType contentType) throws IOException, HttpClientException, HttpServerException {
         Date start = new Date();
@@ -154,12 +177,27 @@ public class HttpClientSession {
         return (new RequestResponse(httpResponse, start));
     }
 
-    public RequestResponse sendForm(String url, List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException {
+    /*
+     $      FORM
+     */
+
+    public @NotNull RequestResponse sendForm(@NotNull String url,
+                                             @NotNull List<NameValuePair> form) throws IOException,
+            HttpClientException,
+            HttpServerException {
+        return (sendForm(url, form, getRequestConfig().build()));
+    }
+
+    public @NotNull RequestResponse sendForm(@NotNull String url,
+                                             @NotNull List<NameValuePair> form,
+                                             @NotNull RequestConfig requestConfig) throws IOException,
+            HttpClientException,
+            HttpServerException {
         Date start = new Date();
         String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
 
         HttpPost httpPost = new HttpPost(url);
-        httpPost.setConfig(getRequestConfig().build());
+        httpPost.setConfig(requestConfig);
         httpPost.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, Consts.UTF_8);
         httpPost.setEntity(entity);

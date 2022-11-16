@@ -19,8 +19,10 @@ import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -72,6 +74,13 @@ public class HttpClientSessionAsync extends HttpClientSession {
         httpClientBuilder.setUserAgent(getUserAgent());
 
         /*
+         * This line below allow redirection (301, 302, 303, 307, 308) to be followed automatically
+         * in the case of a POST request. By default, the HttpClient does not follow redirections for POST requests.
+         * This is specified in the HTTP specification. (HTTP RFC 2616)
+         */
+        httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy());
+
+        /*
          * Create a SSLContext that uses our Trust Strategy to trust all self-signed certificates.
          */
         SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
@@ -120,7 +129,7 @@ public class HttpClientSessionAsync extends HttpClientSession {
     }
 
     @Override
-    public RequestResponse sendGet(String url) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendGet(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
             RequestResponse result = super.sendGet(url);
@@ -146,7 +155,7 @@ public class HttpClientSessionAsync extends HttpClientSession {
     }
 
     @Override
-    public RequestResponse sendForm(String url, List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendForm(@NotNull String url, @NotNull List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
             RequestResponse response = super.sendForm(url, form);

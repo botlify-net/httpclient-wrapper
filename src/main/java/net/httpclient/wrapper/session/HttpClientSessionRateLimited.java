@@ -32,7 +32,7 @@ public class HttpClientSessionRateLimited extends HttpClientSession {
     }
 
     @Override
-    public RequestResponse sendGet(String url) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendGet(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
         rateLimiter.acquire();
         return (super.sendGet(url));
     }
