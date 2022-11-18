@@ -29,7 +29,7 @@ class RateLimiterTest {
     }
 
     @Test
-    public void getRemainingTimeTest() throws InterruptedException {
+    public void getRemainingTimeTest() {
         int durationInSeconds = 3;
         RateLimiter rateLimiter = new RateLimiter(Duration.ofSeconds(durationInSeconds));
         rateLimiter.acquire();

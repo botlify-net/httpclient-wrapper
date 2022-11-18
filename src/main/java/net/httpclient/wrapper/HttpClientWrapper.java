@@ -15,10 +15,10 @@ public class HttpClientWrapper {
      */
     public static boolean hasValidBrightDataProperty() {
         String[] properties = new String[] {
-            "httpClientWrapperBrightDataHost",
-            "httpClientWrapperBrightDataPort",
-            "httpClientWrapperBrightDataUsername",
-            "httpClientWrapperBrightDataPassword"
+            "httpclient.wrapper.proxy.bright-data.host",
+            "httpclient.wrapper.proxy.bright-data.port",
+            "httpclient.wrapper.proxy.bright-data.username",
+            "httpclient.wrapper.proxy.bright-data.password"
         };
         for (String property : properties) {
             if (System.getProperty(property) == null) {
@@ -33,7 +33,7 @@ public class HttpClientWrapper {
      * @return The brightdata host property set.
      */
     public static String getBrightDataHost() {
-        return (System.getProperty("httpClientWrapperBrightDataHost"));
+        return (System.getProperty("httpclient.wrapper.proxy.bright-data.host"));
     }
 
     /**
@@ -41,7 +41,7 @@ public class HttpClientWrapper {
      * @return The brightdata port property set.
      */
     public static int getBrightDataPort() {
-        return (Integer.parseInt(System.getProperty("httpClientWrapperBrightDataPort")));
+        return (Integer.parseInt(System.getProperty("httpclient.wrapper.proxy.bright-data.port")));
     }
 
     /**
@@ -49,7 +49,7 @@ public class HttpClientWrapper {
      * @return The brightdata username property set.
      */
     public static String getBrightDataUsername() {
-        return (System.getProperty("httpClientWrapperBrightDataUsername"));
+        return (System.getProperty("httpclient.wrapper.proxy.bright-data.username"));
     }
 
     /**
@@ -57,7 +57,7 @@ public class HttpClientWrapper {
      * @return The brightdata password property set.
      */
     public static String getBrightDataPassword() {
-        return (System.getProperty("httpClientWrapperBrightDataPassword"));
+        return (System.getProperty("httpclient.wrapper.proxy.bright-data.password"));
     }
 
 }

@@ -19,8 +19,8 @@ Your client can be used with [brightData](brightdata.com) proxy.
 If you want to use this proxy, you have to configure it.
 
 ```java
-System.setProperty("httpClientWrapperBrightDataHost", "YOUR_HOST");
-System.setProperty("httpClientWrapperBrightDataPort", "YOUR_PORT");
-System.setProperty("httpClientWrapperBrightDataUsername", "YOUR_USERNAME");
-System.setProperty("httpClientWrapperBrightDataPassword", "YOUR_PASSWORD");
+System.setProperty("httpclient.wrapper.proxy.bright-data.host", "YOUR_HOST");
+System.setProperty("httpclient.wrapper.proxy.bright-data.port", "YOUR_PORT");
+System.setProperty("httpclient.wrapper.proxy.bright-data.username", "YOUR_USERNAME");
+System.setProperty("httpclient.wrapper.proxy.bright-data.password", "YOUR_PASSWORD");
 ```

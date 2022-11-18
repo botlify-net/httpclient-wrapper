@@ -29,6 +29,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import javax.net.ssl.SSLContext;
@@ -162,6 +163,27 @@ public class HttpClientSession {
      */
 
     public RequestResponse sendPost(String url, String content, ContentType contentType) throws IOException, HttpClientException, HttpServerException {
+        return (sendPost(url, content, contentType, null));
+    }
+
+    public RequestResponse sendPost(@NotNull String url,
+                                    @NotNull JSONObject content,
+                                    @NotNull ContentType contentType) throws HttpClientException, IOException, HttpServerException {
+        return (sendPost(url, content.toString(), contentType, null));
+    }
+
+    public RequestResponse sendPost(@NotNull String url,
+                                    @NotNull JSONObject content,
+                                    @NotNull ContentType contentType,
+                                    @Nullable List<Header> headers) throws HttpClientException, IOException, HttpServerException {
+        return (sendPost(url, content.toString(), contentType, headers));
+    }
+
+    public RequestResponse sendPost(@NotNull String url,
+                                    @NotNull String content,
+                                    @NotNull ContentType contentType,
+                                    @Nullable List<Header> headers) throws IOException,
+            HttpClientException, HttpServerException {
         Date start = new Date();
         String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
 
@@ -169,6 +191,10 @@ public class HttpClientSession {
         httpPost.setConfig(getRequestConfig().build());
         httpPost.addHeader(HttpHeaders.CONTENT_TYPE, contentType.getMimeType());
         httpPost.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
+        if (headers != null) {
+            for (Header header : headers)
+                httpPost.addHeader(header);
+        }
         httpPost.setEntity(new StringEntity(content));
         HttpResponse httpResponse = getHttpClient().execute(httpPost);
 
