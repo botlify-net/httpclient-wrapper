@@ -1,4 +1,4 @@
-name: Maven deployments
+name: Maven deployment to GitHub Package
 
 on: [release]
 
