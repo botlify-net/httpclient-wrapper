@@ -10,21 +10,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class RateLimiterTest {
 
     @Test
-    public void constructTest() {
-        assertThrows(IllegalArgumentException.class, () -> new RateLimiter(null));
-        assertDoesNotThrow(() -> new RateLimiter(Duration.ofSeconds(1)));
-    }
-
-    @Test
     public void acquireTest() {
         int timeSec = 3;
         RateLimiter rateLimiter = new RateLimiter(Duration.ofSeconds(timeSec));
         System.out.println("Start acquire test: " + Instant.now());
-        assertDoesNotThrow(() -> rateLimiter.acquire());
+        assertDoesNotThrow(rateLimiter::acquire);
         System.out.println("Waiting " + timeSec + " second: " + Instant.now());
-        assertDoesNotThrow(() -> rateLimiter.acquire());
+        assertDoesNotThrow(rateLimiter::acquire);
         System.out.println("Waiting " + timeSec + " second: " + Instant.now());
-        assertDoesNotThrow(() -> rateLimiter.acquire());
+        assertDoesNotThrow(rateLimiter::acquire);
         System.out.println("End of test: " + Instant.now());
     }
 
