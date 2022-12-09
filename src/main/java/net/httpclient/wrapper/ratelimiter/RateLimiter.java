@@ -42,7 +42,7 @@ public class RateLimiter {
                 Thread.sleep(durationToSleep.toMillis());
             lastAcquire = Instant.now();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw (new RuntimeException(e));
         }
     }
 

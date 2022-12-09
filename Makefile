@@ -40,3 +40,4 @@ test:
 # This command remove the target directory
 clean:
 					mvn clean
+					rm -rf target | true
