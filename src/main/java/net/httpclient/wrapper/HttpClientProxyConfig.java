@@ -33,7 +33,7 @@ public class HttpClientProxyConfig {
         return (username != null && !username.isEmpty() && password != null && !password.isEmpty());
     }
 
-    static class Builder {
+    public static class Builder {
 
         private String host;
 

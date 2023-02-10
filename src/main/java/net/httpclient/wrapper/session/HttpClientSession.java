@@ -29,6 +29,8 @@ public interface HttpClientSession {
 
     @NotNull HttpClient newHttpClient() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException;
 
+    void resetHttpClient();
+
     @NotNull RequestConfig.Builder getRequestConfig();
 
     @NotNull HttpClient getHttpClient();
