@@ -1,5 +1,6 @@
 package net.httpclient.wrapper.session;
 
+import lombok.Getter;
 import net.httpclient.wrapper.HttpClientProxyConfig;
 import net.httpclient.wrapper.HttpClientWrapper;
 import net.httpclient.wrapper.events.HttpClientSessionEvent;
@@ -55,10 +56,15 @@ public class HttpClientSessionBasic implements HttpClientSession {
      */
 
     protected HttpClient httpClient;
+
     protected HttpClientProxyConfig config = null;
+
     protected final BasicCookieStore httpCookieStore = new BasicCookieStore();
+
     protected RequestConfig.Builder requestConfig;
+
     protected String userAgent = RandomUserAgent.getRandomUserAgent();
+
     protected Object metadata = null;
 
     private final long TIMEOUT = TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
@@ -324,15 +330,15 @@ public class HttpClientSessionBasic implements HttpClientSession {
      *      Getters and Setters
      */
 
-    public HttpClient getHttpClient() {
+    public @NotNull HttpClient getHttpClient() {
         return httpClient;
     }
 
-    public RequestConfig.Builder getRequestConfig() {
+    public RequestConfig.@NotNull Builder getRequestConfig() {
         return requestConfig;
     }
 
-    public BasicCookieStore getHttpCookieStore() {
+    public @NotNull BasicCookieStore getHttpCookieStore() {
         return httpCookieStore;
     }
 
@@ -340,7 +346,7 @@ public class HttpClientSessionBasic implements HttpClientSession {
         return TIMEOUT;
     }
 
-    public void setHttpClient(HttpClient httpClient) {
+    public void setHttpClient(@NotNull final HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 

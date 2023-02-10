@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -27,6 +28,12 @@ import java.util.List;
 public interface HttpClientSession {
 
     @NotNull HttpClient newHttpClient() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException;
+
+    @NotNull RequestConfig.Builder getRequestConfig();
+
+    @NotNull HttpClient getHttpClient();
+
+    @NotNull BasicCookieStore getHttpCookieStore();
 
     /*
      $      Requests
