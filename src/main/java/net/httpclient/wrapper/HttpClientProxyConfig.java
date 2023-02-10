@@ -20,9 +20,9 @@ public class HttpClientProxyConfig {
 
     private HttpClientProxyConfig(@NotNull final Builder builder) {
         if (builder.host == null || builder.host.isEmpty())
-            throw (new IllegalArgumentException("Host cannot be null or empty"));
+            throw (new IllegalArgumentException("Host for proxy configuration cannot be null or empty"));
         if (builder.port <= 0)
-            throw (new IllegalArgumentException("Port cannot be 0 or negative"));
+            throw (new IllegalArgumentException("Port for proxy configuration cannot be 0 or negative"));
         this.host = builder.host;
         this.port = builder.port;
         this.username = builder.username;
@@ -30,7 +30,7 @@ public class HttpClientProxyConfig {
     }
 
     public boolean hasValidCredentials() {
-        return (username != null && !username.isEmpty() && password != null && !password.isEmpty());
+        return (username != null && password != null);
     }
 
     public static class Builder {
@@ -43,13 +43,15 @@ public class HttpClientProxyConfig {
 
         private String password;
 
-        public @NotNull Builder setHostAndPort(@NotNull final String host, final int port) {
+        public @NotNull Builder setHostAndPort(@NotNull final String host,
+                                               final int port) {
             this.host = host;
             this.port = port;
             return (this);
         }
 
-        public @NotNull Builder setUsernameAndPassword(@NotNull final String username, @NotNull final String password) {
+        public @NotNull Builder setUsernameAndPassword(@NotNull final String username,
+                                                       @NotNull final String password) {
             this.username = username;
             this.password = password;
             return (this);

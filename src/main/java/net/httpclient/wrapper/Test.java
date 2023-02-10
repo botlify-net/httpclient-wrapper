@@ -5,8 +5,10 @@ import net.httpclient.wrapper.events.HttpClientSessionListener;
 import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
 import net.httpclient.wrapper.response.RequestResponse;
+import net.httpclient.wrapper.session.HttpClientSession;
 import net.httpclient.wrapper.session.HttpClientSessionBasic;
 import net.httpclient.wrapper.utils.BasicCookieStoreSerializerUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -35,7 +37,7 @@ public class Test implements HttpClientSessionListener {
     }
 
     @Override
-    public void onHttpClientCookiesUpdated(HttpClientSessionBasic httpClientSessionBasic) {
+    public void onHttpClientCookiesUpdated(@NotNull final HttpClientSession httpClientSessionBasic) {
         System.out.println("Cookies updated");
     }
 }

@@ -37,6 +37,8 @@ public interface HttpClientSession {
 
     @NotNull BasicCookieStore getHttpCookieStore();
 
+    @Nullable Object getMetadata();
+
     /*
      $      Requests
      */

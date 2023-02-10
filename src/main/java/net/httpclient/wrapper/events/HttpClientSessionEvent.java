@@ -1,6 +1,8 @@
 package net.httpclient.wrapper.events;
 
+import net.httpclient.wrapper.session.HttpClientSession;
 import net.httpclient.wrapper.session.HttpClientSessionBasic;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
  */
 public class HttpClientSessionEvent {
 
-    private static final ArrayList<HttpClientSessionListener> httpClientSessionBasics = new ArrayList<>();
+    private static final List<HttpClientSessionListener> httpClientSessionBasics = new ArrayList<>();
 
     /*
      $      Add and remove listeners
@@ -20,7 +22,7 @@ public class HttpClientSessionEvent {
      * Add a listener to the list of listeners.
      * @param listener The listener to add.
      */
-    public static void addHttpClientSessionListener(HttpClientSessionListener listener) {
+    public static void addHttpClientSessionListener(@NotNull final HttpClientSessionListener listener) {
         synchronized (httpClientSessionBasics) {
             httpClientSessionBasics.add(listener);
         }
@@ -30,7 +32,7 @@ public class HttpClientSessionEvent {
      * Remove a listener from the list of listeners.
      * @param listener The listener to remove.
      */
-    public static void removeHttpClientSessionListener(HttpClientSessionListener listener) {
+    public static void removeHttpClientSessionListener(@NotNull final HttpClientSessionListener listener) {
         synchronized (httpClientSessionBasics) {
             httpClientSessionBasics.remove(listener);
         }
@@ -42,26 +44,17 @@ public class HttpClientSessionEvent {
 
     /**
      * Trigger the event onHttpClientCookiesUpdated in all listeners.
-     * @param httpClientSessionBasic The HttpClientSessionBasic who has updated his cookies.
+     * @param httpClientSession The HttpClientSessionBasic who has updated his cookies.
      */
-    public static void triggerHttpClientCookiesUpdated(HttpClientSessionBasic httpClientSessionBasic) {
+    public static void triggerHttpClientCookiesUpdated(@NotNull final HttpClientSession httpClientSession) {
         synchronized (httpClientSessionBasics) {
-            httpClientSessionBasics.forEach(listener -> listener.onHttpClientCookiesUpdated(httpClientSessionBasic));
+            httpClientSessionBasics.forEach(listener -> listener.onHttpClientCookiesUpdated(httpClientSession));
         }
     }
 
-
-    /*
-     $      Getters
-     */
-
-    /**
-     * This method return a list copy of the listeners.
-     * @return A list copy of the listeners.
-     */
-    public static List<HttpClientSessionListener> getHttpClientSessionListeners() {
+    public static int countListeners() {
         synchronized (httpClientSessionBasics) {
-            return new ArrayList<>(httpClientSessionBasics);
+            return (httpClientSessionBasics.size());
         }
     }
 

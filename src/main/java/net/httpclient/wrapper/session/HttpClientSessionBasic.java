@@ -135,8 +135,10 @@ public class HttpClientSessionBasic implements HttpClientSession {
         if (config != null) {
             HttpHost brightDataProxy = new HttpHost(config.getHost(), config.getPort());
             if (config.hasValidCredentials()) {
+                assert config.getUsername() != null;
+                assert config.getPassword() != null;
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(HttpClientWrapper.getBrightDataUsername(), HttpClientWrapper.getBrightDataPassword());
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getUsername(), config.getPassword());
                 credentialsProvider.setCredentials(new AuthScope(brightDataProxy), credentials);
                 httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
             }
@@ -315,7 +317,7 @@ public class HttpClientSessionBasic implements HttpClientSession {
      * @param serializedOldCookieStore The old cookie store before the request serialized as string.
      */
     private void verifyCookiesEvents(String serializedOldCookieStore) {
-        if (HttpClientSessionEvent.getHttpClientSessionListeners().size() == 0)
+        if (HttpClientSessionEvent.countListeners() == 0)
             return;
         try {
             String serializedNewCookieStore = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
@@ -379,7 +381,7 @@ public class HttpClientSessionBasic implements HttpClientSession {
         this.userAgent = userAgent;
     }
 
-    public Object getMetadata() {
+    public @Nullable Object getMetadata() {
         return metadata;
     }
 

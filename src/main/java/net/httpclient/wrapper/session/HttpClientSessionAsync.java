@@ -122,8 +122,10 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
         if (config != null) {
             HttpHost brightDataProxy = new HttpHost(config.getHost(), config.getPort());
             if (config.hasValidCredentials()) {
+                assert config.getUsername() != null;
+                assert config.getPassword() != null;
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(HttpClientWrapper.getBrightDataUsername(), HttpClientWrapper.getBrightDataPassword());
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getUsername(), config.getPassword());
                 credentialsProvider.setCredentials(new AuthScope(brightDataProxy), credentials);
                 httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
             }
