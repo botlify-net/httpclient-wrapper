@@ -55,6 +55,10 @@ public class HttpClientProxyConfig {
             return (this);
         }
 
+        public @NotNull HttpClientProxyConfig build() {
+            return (new HttpClientProxyConfig(this));
+        }
+
     }
 
 }
