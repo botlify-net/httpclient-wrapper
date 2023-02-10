@@ -1,12 +1,12 @@
 package net.httpclient.wrapper.events;
 
-import net.httpclient.wrapper.session.HttpClientSession;
+import net.httpclient.wrapper.session.HttpClientSessionBasic;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This static class manage the HttpClientSession events.
+ * This static class manage the HttpClientSessionBasic events.
  */
 public class HttpClientSessionEvent {
 
@@ -42,11 +42,11 @@ public class HttpClientSessionEvent {
 
     /**
      * Trigger the event onHttpClientCookiesUpdated in all listeners.
-     * @param httpClientSession The HttpClientSession who has updated his cookies.
+     * @param httpClientSessionBasic The HttpClientSessionBasic who has updated his cookies.
      */
-    public static void triggerHttpClientCookiesUpdated(HttpClientSession httpClientSession) {
+    public static void triggerHttpClientCookiesUpdated(HttpClientSessionBasic httpClientSessionBasic) {
         synchronized (httpClientSessionBasics) {
-            httpClientSessionBasics.forEach(listener -> listener.onHttpClientCookiesUpdated(httpClientSession));
+            httpClientSessionBasics.forEach(listener -> listener.onHttpClientCookiesUpdated(httpClientSessionBasic));
         }
     }
 

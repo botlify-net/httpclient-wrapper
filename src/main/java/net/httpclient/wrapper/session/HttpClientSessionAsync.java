@@ -1,5 +1,6 @@
 package net.httpclient.wrapper.session;
 
+import net.httpclient.wrapper.HttpClientProxyConfig;
 import net.httpclient.wrapper.HttpClientWrapper;
 import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
@@ -34,26 +35,19 @@ import java.util.concurrent.Semaphore;
 
 import static net.httpclient.wrapper.HttpClientWrapper.logger;
 
-public class HttpClientSessionAsync extends HttpClientSession {
+public class HttpClientSessionAsync extends HttpClientSessionBasic {
 
     /*
      $      Variable of the class
      */
 
     private final Semaphore semaphore;
+
     private final int MAX_SYNCHRONOUS_REQUEST;
 
     /*
      $      Constructor
      */
-
-    /**
-     * Create a new session with a default number of simultaneous requests
-     * set to <b>1</b>.
-     */
-    public HttpClientSessionAsync() {
-        this(1);
-    }
 
     public HttpClientSessionAsync(int maxSynchronousRequest) {
         try {
@@ -66,10 +60,25 @@ public class HttpClientSessionAsync extends HttpClientSession {
         }
     }
 
+    public HttpClientSessionAsync(@NotNull final HttpClientProxyConfig config,
+                                  final int maxSynchronousRequest) {
+        try {
+            this.MAX_SYNCHRONOUS_REQUEST = maxSynchronousRequest;
+            this.semaphore = new Semaphore(maxSynchronousRequest);
+            this.config = config;
+            this.httpClient = newHttpClient();
+            this.requestConfig = setRequestConfig();
+        } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    /*
+     $      Override methods
+     */
 
     @Override
-    public HttpClient newHttpClient() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
+    public @NotNull HttpClient newHttpClient() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.setUserAgent(getUserAgent());
 
@@ -106,16 +115,19 @@ public class HttpClientSessionAsync extends HttpClientSession {
          * Verify if the Bright data proxy is enabled.
          * If it is enabled, the HttpClient will use the proxy.
          */
-        if (HttpClientWrapper.hasValidBrightDataProperty()) {
-            HttpHost brightDataProxy = new HttpHost(HttpClientWrapper.getBrightDataHost(), HttpClientWrapper.getBrightDataPort());
-
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(HttpClientWrapper.getBrightDataUsername(), HttpClientWrapper.getBrightDataPassword());
-            credentialsProvider.setCredentials(new AuthScope(brightDataProxy), credentials);
-
-            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+        /*
+         * Verify if the Bright data proxy is enabled.
+         * If it is enabled, the HttpClient will use the proxy.
+         */
+        if (config != null) {
+            HttpHost brightDataProxy = new HttpHost(config.getHost(), config.getPort());
+            if (config.hasValidCredentials()) {
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(HttpClientWrapper.getBrightDataUsername(), HttpClientWrapper.getBrightDataPassword());
+                credentialsProvider.setCredentials(new AuthScope(brightDataProxy), credentials);
+                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            }
             httpClientBuilder.setProxy(brightDataProxy);
-            //httpClientBuilder.setProxy(new HttpHost("127.0.0.1", 8888));
         }
 
         /*
@@ -142,7 +154,7 @@ public class HttpClientSessionAsync extends HttpClientSession {
     }
 
     @Override
-    public RequestResponse sendPost(String url, String content, ContentType contentType) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendPost(@NotNull String url, @NotNull String content, @NotNull ContentType contentType) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
             RequestResponse result = super.sendPost(url, content, contentType);
@@ -168,7 +180,7 @@ public class HttpClientSessionAsync extends HttpClientSession {
     }
 
     @Override
-    public RequestResponse sendDelete(String url) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendDelete(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
             RequestResponse response = super.sendDelete(url);
@@ -181,7 +193,7 @@ public class HttpClientSessionAsync extends HttpClientSession {
     }
 
     @Override
-    public RequestResponse sendPut(String url, String content, ContentType contentType) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendPut(@NotNull String url, @NotNull String content, @NotNull ContentType contentType) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
             RequestResponse response = super.sendPut(url, content, contentType);

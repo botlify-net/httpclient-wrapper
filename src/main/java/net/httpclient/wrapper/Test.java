@@ -5,9 +5,8 @@ import net.httpclient.wrapper.events.HttpClientSessionListener;
 import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
 import net.httpclient.wrapper.response.RequestResponse;
-import net.httpclient.wrapper.session.HttpClientSession;
+import net.httpclient.wrapper.session.HttpClientSessionBasic;
 import net.httpclient.wrapper.utils.BasicCookieStoreSerializerUtils;
-import org.apache.http.impl.client.BasicCookieStore;
 
 import java.io.IOException;
 
@@ -18,17 +17,17 @@ public class Test implements HttpClientSessionListener {
         HttpClientSessionEvent.addHttpClientSessionListener(new Test());
 
 
-        HttpClientSession httpClientSession = new HttpClientSession();
-        RequestResponse requestResponse = httpClientSession.sendGet("https://lincos.tools/content/11-cookie");
+        HttpClientSessionBasic httpClientSessionBasic = new HttpClientSessionBasic();
+        RequestResponse requestResponse = httpClientSessionBasic.sendGet("https://lincos.tools/content/11-cookie");
         System.out.println(requestResponse.getStatusCode());
-        System.out.println(BasicCookieStoreSerializerUtils.serializableToBase64(httpClientSession.getHttpCookieStore()));
-        requestResponse = httpClientSession.sendGet("https://www.nautiljon.com/");
+        System.out.println(BasicCookieStoreSerializerUtils.serializableToBase64(httpClientSessionBasic.getHttpCookieStore()));
+        requestResponse = httpClientSessionBasic.sendGet("https://www.nautiljon.com/");
         System.out.println(requestResponse.getStatusCode());
-        System.out.println(BasicCookieStoreSerializerUtils.serializableToBase64(httpClientSession.getHttpCookieStore()));
+        System.out.println(BasicCookieStoreSerializerUtils.serializableToBase64(httpClientSessionBasic.getHttpCookieStore()));
         System.out.println("Finished !\n");
 
         // print all cookies
-        for (org.apache.http.cookie.Cookie cookie : httpClientSession.getHttpCookieStore().getCookies()) {
+        for (org.apache.http.cookie.Cookie cookie : httpClientSessionBasic.getHttpCookieStore().getCookies()) {
             System.out.println(cookie.getDomain() + " : " + cookie.getPath());
             System.out.println("\t => " + cookie.getName() + " : " + cookie.getValue());
         }
@@ -36,7 +35,7 @@ public class Test implements HttpClientSessionListener {
     }
 
     @Override
-    public void onHttpClientCookiesUpdated(HttpClientSession httpClientSession) {
+    public void onHttpClientCookiesUpdated(HttpClientSessionBasic httpClientSessionBasic) {
         System.out.println("Cookies updated");
     }
 }

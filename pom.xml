@@ -6,8 +6,7 @@
 
     <groupId>net.httpclient.wrapper</groupId>
     <artifactId>httpclient-wrapper</artifactId>
-    <version>1.0.0</version>
-    <url>https://github.com/florianepitech/httpclient-wrapper</url>
+    <version>1.0</version>
     <description>Stunning wrapper for apache httpclient</description>
 
     <build>

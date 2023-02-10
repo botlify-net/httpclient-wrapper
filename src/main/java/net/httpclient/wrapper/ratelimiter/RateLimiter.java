@@ -24,7 +24,7 @@ public class RateLimiter {
      * Create a rate limiter with a duration.
      * @param duration The duration between each acquire.
      */
-    public RateLimiter(@NotNull Duration duration) {
+    public RateLimiter(@NotNull final Duration duration) {
         this.duration = duration;
     }
 
@@ -38,9 +38,9 @@ public class RateLimiter {
                 return;
             }
             Duration durationToSleep = getRemainingDuration();
+            lastAcquire = Instant.now();
             if (!durationToSleep.isZero() && !durationToSleep.isNegative())
                 Thread.sleep(durationToSleep.toMillis());
-            lastAcquire = Instant.now();
         } catch (InterruptedException e) {
             throw (new RuntimeException(e));
         }

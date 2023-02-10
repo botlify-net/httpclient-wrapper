@@ -3,6 +3,7 @@ package net.httpclient.wrapper;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.json.Cookie;
 
 public class HttpClientWrapper {
@@ -27,6 +28,10 @@ public class HttpClientWrapper {
         }
         return (true);
     }
+
+    /*
+     $      Get BrightData configuration
+     */
 
     /**
      * This function will return the brightdata host property set.
@@ -58,6 +63,26 @@ public class HttpClientWrapper {
      */
     public static String getBrightDataPassword() {
         return (System.getProperty("httpclient.wrapper.proxy.bright-data.password"));
+    }
+
+    /*
+     $      Set BrightData configuration
+     */
+
+    public static void setBrightDataHost(@NotNull final String host) {
+        System.setProperty("httpclient.wrapper.proxy.bright-data.host", host);
+    }
+
+    public static void setBrightDataPort(final int port) {
+        System.setProperty("httpclient.wrapper.proxy.bright-data.port", String.valueOf(port));
+    }
+
+    public static void setBrightDataUsername(@NotNull final String username) {
+        System.setProperty("httpclient.wrapper.proxy.bright-data.username", username);
+    }
+
+    public static void setBrightDataPassword(@NotNull final String password) {
+        System.setProperty("httpclient.wrapper.proxy.bright-data.password", password);
     }
 
 }
