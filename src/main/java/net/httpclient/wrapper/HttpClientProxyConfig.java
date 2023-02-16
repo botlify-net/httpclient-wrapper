@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.http.HttpClient;
+
 public class HttpClientProxyConfig {
 
     @NotNull @Getter
