@@ -1,24 +1,38 @@
-package net.httpclient.wrapper.utils;
+package net.httpclient.wrapper.headers;
 
 import lombok.Getter;
-import net.httpclient.wrapper.enums.AcceptLanguage;
+import net.httpclient.wrapper.headers.enums.AcceptLanguage;
+import net.httpclient.wrapper.headers.enums.HttpHeaders;
+import net.httpclient.wrapper.utils.RandomUserAgent;
 import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
+import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 public class FakeHeaders {
 
-    private final List<Header> headers = new ArrayList<>();
+    @NotNull @Getter
+    private final List<Header> headers;
 
     public FakeHeaders(@NotNull final FakeHeaders.Builder builder) {
-        headers.add(new BasicHeader(HttpHeaders.USER_AGENT, builder.userAgent));
-        headers.add(new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, getAcceptLanguage(builder.acceptLanguage, builder.secondaryAcceptLanguages)));
+        headers = new ArrayList<>();
+        headers.add(new BasicHeader(HttpHeaders.USER_AGENT.getHeaderName(), builder.userAgent));
+        headers.add(new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE.getHeaderName(), getAcceptLanguage(builder.acceptLanguage, builder.secondaryAcceptLanguages)));
+        headers.add(new BasicHeader(HttpHeaders.ACCEPT_ENCODING.getHeaderName(), getRandomAcceptEncoding()));
+        headers.add(new BasicHeader(HttpHeaders.CACHE_CONTROL.getHeaderName(), getCacheControl()));
+        headers.add(new BasicHeader(HttpHeaders.CONNECTION.getHeaderName(), getConnexion()));
+        headers.add(new BasicHeader(HttpHeaders.PRAGMA.getHeaderName(), getPragma()));
+        headers.add(new BasicHeader(HttpHeaders.SEC_FETCH_DEST.getHeaderName(), getSecFetchDest()));
+        headers.add(new BasicHeader(HttpHeaders.SEC_FETCH_MODE.getHeaderName(), getSecFetchMode()));
+        headers.add(new BasicHeader(HttpHeaders.SEC_FETCH_SITE.getHeaderName(), getSecFetchSite()));
+        // sort list alphabetically
+        headers.sort(Comparator.comparing(NameValuePair::getName));
     }
 
     /*
@@ -28,10 +42,12 @@ public class FakeHeaders {
     @NotNull String getAcceptLanguage(@NotNull final AcceptLanguage primaryLanguage,
                                       @Nullable final Map<AcceptLanguage, Float> languages) {
         final StringBuilder strBuilder = new StringBuilder();
-
         strBuilder.append(primaryLanguage.getCode());
         if (languages != null && !languages.isEmpty()) {
-            for (final Map.Entry<AcceptLanguage, Float> entry : languages.entrySet()) {
+            List<Map.Entry<AcceptLanguage, Float>> sortedLanguages = new ArrayList<>(languages.entrySet());
+            sortedLanguages.sort((o1, o2) -> (Float.compare(o2.getValue(), o1.getValue())));
+
+            for (final Map.Entry<AcceptLanguage, Float> entry : sortedLanguages) {
                 final AcceptLanguage language = entry.getKey();
                 final Float weight = entry.getValue();
                 strBuilder.append(",").append(language.getCode()).append(";q=").append(weight);
