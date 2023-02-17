@@ -1,9 +1,10 @@
-package net.httpclient.wrapper.headers.enums;
+package net.httpclient.wrapper.headers;
 
 import lombok.Getter;
-import net.httpclient.wrapper.headers.FakeHeaders;
+import net.httpclient.wrapper.headers.enums.HttpHeaders;
 import org.apache.http.Header;
 import org.apache.http.NameValuePair;
+import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicHeader;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +23,10 @@ public class FakeHeadersRequest {
             headers.add(new BasicHeader(HttpHeaders.REFERER.getHeaderName(), builder.referer));
         if (builder.host != null)
             headers.add(new BasicHeader(HttpHeaders.HOST.getHeaderName(), builder.host));
+        if (builder.accept != null)
+            headers.add(new BasicHeader(HttpHeaders.ACCEPT.getHeaderName(), builder.accept));
+        if (builder.contentType != null)
+            headers.add(new BasicHeader(HttpHeaders.CONTENT_TYPE.getHeaderName(), builder.contentType.toString()));
         // sort list alphabetically
         headers.sort(Comparator.comparing(NameValuePair::getName));
     }
@@ -34,6 +39,11 @@ public class FakeHeadersRequest {
 
         private String host = null;
 
+        @Deprecated
+        private String accept = null;
+
+        private ContentType contentType = null;
+
         public Builder(@NotNull final FakeHeaders fakeHeaders) {
             this.fakeHeaders = fakeHeaders;
         }
@@ -45,6 +55,17 @@ public class FakeHeadersRequest {
 
         public @NotNull Builder setHost(@NotNull final String host) {
             this.host = host;
+            return (this);
+        }
+
+        @Deprecated
+        public @NotNull Builder setAccept(@NotNull final String accept) {
+            this.accept = accept;
+            return (this);
+        }
+
+        public @NotNull Builder setContentType(@NotNull final ContentType contentType) {
+            this.contentType = contentType;
             return (this);
         }
 
