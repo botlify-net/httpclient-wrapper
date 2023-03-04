@@ -4,12 +4,14 @@ import net.httpclient.wrapper.HttpClientProxyConfig;
 import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
 import net.httpclient.wrapper.response.RequestResponse;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -23,6 +25,8 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -143,6 +147,8 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
      $      Requests
      */
 
+    // GET
+
     @Override
     public @NotNull RequestResponse sendGet(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
         try {
@@ -156,6 +162,39 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public @NotNull RequestResponse sendGet(@NotNull final String url,
+                                            @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
+        try {
+            semaphore.acquire();
+            try {
+                return (super.sendGet(url, requestConfig));
+            } finally {
+                semaphore.release();
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public @NotNull RequestResponse sendGet(@NotNull final String url,
+                                            @NotNull final List<Header> headers,
+                                            @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
+        try {
+            semaphore.acquire();
+            try {
+                return (super.sendGet(url, headers, requestConfig));
+            } finally {
+                semaphore.release();
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // POST
 
     @Override
     public @NotNull RequestResponse sendPost(@NotNull final String url,
@@ -174,6 +213,58 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
     }
 
     @Override
+    public @NotNull RequestResponse sendPost(@NotNull final String url,
+                                             @NotNull final JSONObject content,
+                                             @NotNull final ContentType contentType) throws HttpClientException, IOException, HttpServerException {
+        try {
+            semaphore.acquire();
+            try {
+                return (super.sendPost(url, content, contentType));
+            } finally {
+                semaphore.release();
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public @NotNull RequestResponse sendPost(@NotNull final String url,
+                                             @NotNull final JSONObject content,
+                                             @NotNull final ContentType contentType,
+                                             @Nullable final List<Header> headers) throws HttpClientException, IOException, HttpServerException {
+        try {
+            semaphore.acquire();
+            try {
+                return (super.sendPost(url, content, contentType, headers));
+            } finally {
+                semaphore.release();
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public @NotNull RequestResponse sendPost(@NotNull final String url,
+                                             @NotNull final String content,
+                                             @NotNull final ContentType contentType,
+                                             @Nullable final List<Header> headers) throws IOException, HttpClientException, HttpServerException {
+        try {
+            semaphore.acquire();
+            try {
+                return (super.sendPost(url, content, contentType, headers));
+            } finally {
+                semaphore.release();
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // FORM
+
+    @Override
     public @NotNull RequestResponse sendForm(@NotNull final String url,
                                              @NotNull final List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException {
         try {
@@ -189,6 +280,24 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
     }
 
     @Override
+    public @NotNull RequestResponse sendForm(@NotNull final String url,
+                                             @NotNull final List<NameValuePair> form,
+                                             @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
+        try {
+            semaphore.acquire();
+            try {
+                return (super.sendForm(url, form, requestConfig));
+            } finally {
+                semaphore.release();
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // DELETE
+
+    @Override
     public @NotNull RequestResponse sendDelete(@NotNull final String url) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
@@ -201,6 +310,8 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
             throw new RuntimeException(e);
         }
     }
+
+    // PUT
 
     @Override
     public @NotNull RequestResponse sendPut(@NotNull final String url,

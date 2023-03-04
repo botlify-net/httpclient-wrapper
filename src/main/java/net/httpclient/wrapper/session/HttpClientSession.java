@@ -40,24 +40,38 @@ public interface HttpClientSession {
 
     @NotNull RequestResponse sendGet(@NotNull final String url) throws IOException, HttpClientException, HttpServerException;
 
-    @NotNull RequestResponse sendGet(@NotNull final String url, @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException;
+    @NotNull RequestResponse sendGet(@NotNull final String url,
+                                     @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException;
 
     // POST
 
-    @NotNull RequestResponse sendPost(@NotNull final String url, @NotNull final String content, @NotNull final ContentType contentType) throws IOException, HttpClientException, HttpServerException;
+    @NotNull RequestResponse sendPost(@NotNull final String url,
+                                      @NotNull final String content,
+                                      @NotNull final ContentType contentType) throws IOException, HttpClientException, HttpServerException;
 
-    @NotNull RequestResponse sendPost(@NotNull final String url, @NotNull final JSONObject content, @NotNull final ContentType contentType) throws HttpClientException, IOException, HttpServerException;
+    @NotNull RequestResponse sendPost(@NotNull final String url,
+                                      @NotNull final JSONObject content,
+                                      @NotNull final ContentType contentType) throws HttpClientException, IOException, HttpServerException;
 
-    @NotNull RequestResponse sendPost(@NotNull final String url, @NotNull final JSONObject content, @NotNull final ContentType contentType, @Nullable final List<Header> headers) throws HttpClientException, IOException, HttpServerException;
+    @NotNull RequestResponse sendPost(@NotNull final String url,
+                                      @NotNull final JSONObject content,
+                                      @NotNull final ContentType contentType,
+                                      @Nullable final List<Header> headers) throws HttpClientException, IOException, HttpServerException;
 
-    @NotNull RequestResponse sendPost(@NotNull final String url, @NotNull final String content, @NotNull final ContentType contentType, @Nullable final List<Header> headers) throws IOException,
+    @NotNull RequestResponse sendPost(@NotNull final String url,
+                                      @NotNull final String content,
+                                      @NotNull final ContentType contentType,
+                                      @Nullable final List<Header> headers) throws IOException,
             HttpClientException, HttpServerException;
 
     // FORM
 
-    @NotNull RequestResponse sendForm(@NotNull final String url, @NotNull final List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException;
+    @NotNull RequestResponse sendForm(@NotNull final String url,
+                                      @NotNull final List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException;
 
-    @NotNull RequestResponse sendForm(@NotNull final String url, @NotNull final List<NameValuePair> form, @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException;
+    @NotNull RequestResponse sendForm(@NotNull final String url,
+                                      @NotNull final List<NameValuePair> form,
+                                      @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException;
 
     // DELETE
 
@@ -65,6 +79,8 @@ public interface HttpClientSession {
 
     // PUT
 
-    @NotNull RequestResponse sendPut(@NotNull final String url, @NotNull final String content, @NotNull final ContentType contentType) throws IOException, HttpClientException, HttpServerException;
+    @NotNull RequestResponse sendPut(@NotNull final String url,
+                                     @NotNull final String content,
+                                     @NotNull final ContentType contentType) throws IOException, HttpClientException, HttpServerException;
 
 }
