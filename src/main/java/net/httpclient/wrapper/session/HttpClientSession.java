@@ -3,16 +3,10 @@ package net.httpclient.wrapper.session;
 import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
 import net.httpclient.wrapper.response.RequestResponse;
-import net.httpclient.wrapper.utils.BasicCookieStoreSerializerUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +16,6 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.List;
 
 public interface HttpClientSession {

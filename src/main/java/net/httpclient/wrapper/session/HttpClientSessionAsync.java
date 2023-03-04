@@ -1,7 +1,6 @@
 package net.httpclient.wrapper.session;
 
 import net.httpclient.wrapper.HttpClientProxyConfig;
-import net.httpclient.wrapper.HttpClientWrapper;
 import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
 import net.httpclient.wrapper.response.RequestResponse;
@@ -33,8 +32,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import static net.httpclient.wrapper.HttpClientWrapper.logger;
-
 public class HttpClientSessionAsync extends HttpClientSessionBasic {
 
     /*
@@ -49,7 +46,7 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
      $      Constructor
      */
 
-    public HttpClientSessionAsync(int maxSynchronousRequest) {
+    public HttpClientSessionAsync(final int maxSynchronousRequest) {
         try {
             this.MAX_SYNCHRONOUS_REQUEST = maxSynchronousRequest;
             this.semaphore = new Semaphore(maxSynchronousRequest);
@@ -142,68 +139,82 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
         return (httpClientBuilder.build());
     }
 
+    /*
+     $      Requests
+     */
+
     @Override
     public @NotNull RequestResponse sendGet(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
-            RequestResponse result = super.sendGet(url);
-            semaphore.release();
-            return (result);
+            try {
+                return (super.sendGet(url));
+            } finally {
+                semaphore.release();
+            }
         } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
-        return (null);
     }
 
     @Override
-    public @NotNull RequestResponse sendPost(@NotNull String url, @NotNull String content, @NotNull ContentType contentType) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendPost(@NotNull final String url,
+                                             @NotNull final String content,
+                                             @NotNull final ContentType contentType) throws HttpClientException, IOException, HttpServerException {
         try {
             semaphore.acquire();
-            RequestResponse result = super.sendPost(url, content, contentType);
-            semaphore.release();
-            return (result);
+            try {
+                return (super.sendPost(url, content, contentType));
+            } finally {
+                semaphore.release();
+            }
         } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
-        return (null);
     }
 
     @Override
-    public @NotNull RequestResponse sendForm(@NotNull String url, @NotNull List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendForm(@NotNull final String url,
+                                             @NotNull final List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
-            RequestResponse response = super.sendForm(url, form);
-            semaphore.release();
-            return (response);
+            try {
+                return (super.sendForm(url, form));
+            } finally {
+                semaphore.release();
+            }
         } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
-        return (null);
     }
 
     @Override
-    public @NotNull RequestResponse sendDelete(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendDelete(@NotNull final String url) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
-            RequestResponse response = super.sendDelete(url);
-            semaphore.release();
-            return (response);
+            try {
+                return (super.sendDelete(url));
+            } finally {
+                semaphore.release();
+            }
         } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
-        return (null);
     }
 
     @Override
-    public @NotNull RequestResponse sendPut(@NotNull String url, @NotNull String content, @NotNull ContentType contentType) throws IOException, HttpClientException, HttpServerException {
+    public @NotNull RequestResponse sendPut(@NotNull final String url,
+                                            @NotNull final String content,
+                                            @NotNull final ContentType contentType) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
-            RequestResponse response = super.sendPut(url, content, contentType);
-            semaphore.release();
-            return (response);
+            try {
+                return (super.sendPut(url, content, contentType));
+            } finally {
+                semaphore.release();
+            }
         } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
-        return (null);
     }
 }
