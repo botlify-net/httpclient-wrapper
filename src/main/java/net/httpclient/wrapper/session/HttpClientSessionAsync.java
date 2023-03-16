@@ -52,6 +52,8 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
 
     public HttpClientSessionAsync(final int maxSynchronousRequest) {
         try {
+            if (maxSynchronousRequest <= 0)
+                throw (new IllegalArgumentException("Max synchronous request cannot be 0 or negative"));
             this.MAX_SYNCHRONOUS_REQUEST = maxSynchronousRequest;
             this.semaphore = new Semaphore(maxSynchronousRequest);
             this.httpClient = newHttpClient();
@@ -64,6 +66,8 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
     public HttpClientSessionAsync(@NotNull final HttpClientProxyConfig config,
                                   final int maxSynchronousRequest) {
         try {
+            if (maxSynchronousRequest <= 0)
+                throw (new IllegalArgumentException("Max synchronous request cannot be 0 or negative"));
             this.MAX_SYNCHRONOUS_REQUEST = maxSynchronousRequest;
             this.semaphore = new Semaphore(maxSynchronousRequest);
             this.config = config;
@@ -109,8 +113,8 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
          */
         PoolingHttpClientConnectionManager poolingClientConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
         poolingClientConnectionManager.setValidateAfterInactivity((int) (getTimeout() / 2));
-        poolingClientConnectionManager.setMaxTotal(MAX_SYNCHRONOUS_REQUEST == 0 ? 3 : MAX_SYNCHRONOUS_REQUEST);
-        poolingClientConnectionManager.setDefaultMaxPerRoute(MAX_SYNCHRONOUS_REQUEST == 0 ? 3 : MAX_SYNCHRONOUS_REQUEST);
+        poolingClientConnectionManager.setMaxTotal(MAX_SYNCHRONOUS_REQUEST);
+        poolingClientConnectionManager.setDefaultMaxPerRoute(MAX_SYNCHRONOUS_REQUEST);
 
         /*
          * Verify if the Bright data proxy is enabled.
