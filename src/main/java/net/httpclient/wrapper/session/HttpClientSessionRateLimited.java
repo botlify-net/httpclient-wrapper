@@ -5,9 +5,12 @@ import net.httpclient.wrapper.exception.HttpClientException;
 import net.httpclient.wrapper.exception.HttpServerException;
 import net.httpclient.wrapper.ratelimiter.RateLimiter;
 import net.httpclient.wrapper.response.RequestResponse;
+import org.apache.http.Header;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.entity.ContentType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -37,27 +40,27 @@ public class HttpClientSessionRateLimited extends HttpClientSessionBasic {
      */
 
     @Override
-    public @NotNull RequestResponse sendPost(@NotNull String url, @NotNull String content, @NotNull ContentType contentType) throws IOException, HttpClientException, HttpServerException {
-        rateLimiter.acquire();
-        return (super.sendPost(url, content, contentType));
-    }
-
-    @Override
-    public @NotNull RequestResponse sendGet(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
-        rateLimiter.acquire();
-        return (super.sendGet(url));
-    }
-
-    @Override
-    public @NotNull RequestResponse sendDelete(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
-        rateLimiter.acquire();
-        return (super.sendDelete(url));
-    }
-
-    @Override
     public @NotNull RequestResponse sendPut(@NotNull String url, @NotNull String content, @NotNull ContentType contentType) throws IOException, HttpClientException, HttpServerException {
         rateLimiter.acquire();
         return (super.sendPut(url, content, contentType));
+    }
+
+    @Override
+    public @NotNull RequestResponse sendGet(@NotNull String url, @NotNull List<Header> headers, @NotNull RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
+        rateLimiter.acquire();
+        return super.sendGet(url, headers, requestConfig);
+    }
+
+    @Override
+    public @NotNull RequestResponse sendPost(@NotNull String url, @NotNull String content, @NotNull ContentType contentType, @Nullable List<Header> headers) throws IOException, HttpClientException, HttpServerException {
+        rateLimiter.acquire();
+        return super.sendPost(url, content, contentType, headers);
+    }
+
+    @Override
+    public @NotNull RequestResponse sendForm(@NotNull String url, @NotNull List<NameValuePair> form, @NotNull RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
+        rateLimiter.acquire();
+        return super.sendForm(url, form, requestConfig);
     }
 
     /**

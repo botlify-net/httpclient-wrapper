@@ -89,11 +89,11 @@ public class HttpClientSessionBasic implements HttpClientSession {
             this.httpClient = newHttpClient();
             this.requestConfig = setRequestConfig();
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            throw new RuntimeException(e);
+            throw (new RuntimeException(e));
         }
     }
 
-    public RequestConfig.Builder setRequestConfig() {
+    public final RequestConfig.Builder setRequestConfig() {
         RequestConfig.Builder builder = RequestConfig.custom();
         builder.setConnectTimeout((int) TIMEOUT);
         builder.setSocketTimeout((int) TIMEOUT);
@@ -103,7 +103,7 @@ public class HttpClientSessionBasic implements HttpClientSession {
         return builder;
     }
 
-    public void resetHttpClient() {
+    public final void resetHttpClient() {
         try {
             this.httpCookieStore.clear();
             this.httpClient = newHttpClient();
@@ -158,13 +158,13 @@ public class HttpClientSessionBasic implements HttpClientSession {
      $      GET
      */
 
-    public @NotNull RequestResponse sendGet(@NotNull final String url) throws IOException, HttpClientException, HttpServerException {
-        return (sendGet(url, getRequestConfig().build()));
+    public final @NotNull RequestResponse sendGet(@NotNull final String url) throws IOException, HttpClientException, HttpServerException {
+        return (this.sendGet(url, getRequestConfig().build()));
     }
 
-    public @NotNull RequestResponse sendGet(@NotNull final String url,
-                                            @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
-        return (sendGet(url, new ArrayList<>(0), requestConfig));
+    public final @NotNull RequestResponse sendGet(@NotNull final String url,
+                                                  @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
+        return (this.sendGet(url, new ArrayList<>(0), requestConfig));
     }
 
     public @NotNull RequestResponse sendGet(@NotNull final String url,
@@ -172,42 +172,41 @@ public class HttpClientSessionBasic implements HttpClientSession {
                                             @NotNull final RequestConfig requestConfig) throws IOException,
             HttpClientException,
             HttpServerException {
-        Date start = new Date();
-        String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
+        final Date start = new Date();
+        final String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
 
-        HttpGet httpGet = new HttpGet(url);
+        final HttpGet httpGet = new HttpGet(url);
         httpGet.setConfig(requestConfig);
         httpGet.addHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*");
         httpGet.addHeader(HttpHeaders.USER_AGENT, userAgent);
-        for (Header header : headers) {
-            httpGet.addHeader(header);
-        }
-        HttpResponse httpResponse = getHttpClient().execute(httpGet);
+        for (Header header : headers) httpGet.addHeader(header);
+
+        final HttpResponse httpResponse = getHttpClient().execute(httpGet);
         assertRequest(httpResponse, start);
 
         verifyCookiesEvents(oldCookieStoreSerialized);
         return (new RequestResponse(httpResponse, start));
     }
 
-    /*
-     $      POST
-     */
+    // POST
 
-    public @NotNull RequestResponse sendPost(@NotNull String url, @NotNull String content, @NotNull ContentType contentType) throws IOException, HttpClientException, HttpServerException {
-        return (sendPost(url, content, contentType, null));
+    public final @NotNull RequestResponse sendPost(@NotNull final String url,
+                                                   @NotNull final String content,
+                                                   @NotNull final ContentType contentType) throws IOException, HttpClientException, HttpServerException {
+        return (this.sendPost(url, content, contentType, null));
     }
 
-    public @NotNull RequestResponse sendPost(@NotNull String url,
-                                             @NotNull JSONObject content,
-                                             @NotNull ContentType contentType) throws HttpClientException, IOException, HttpServerException {
-        return (sendPost(url, content.toString(), contentType, null));
+    public final @NotNull RequestResponse sendPost(@NotNull final String url,
+                                                   @NotNull final JSONObject content,
+                                                   @NotNull final ContentType contentType) throws HttpClientException, IOException, HttpServerException {
+        return (this.sendPost(url, content.toString(), contentType, null));
     }
 
-    public @NotNull RequestResponse sendPost(@NotNull String url,
-                                             @NotNull JSONObject content,
-                                             @NotNull ContentType contentType,
-                                             @Nullable List<Header> headers) throws HttpClientException, IOException, HttpServerException {
-        return (sendPost(url, content.toString(), contentType, headers));
+    public final @NotNull RequestResponse sendPost(@NotNull String url,
+                                                   @NotNull JSONObject content,
+                                                   @NotNull ContentType contentType,
+                                                   @Nullable List<Header> headers) throws HttpClientException, IOException, HttpServerException {
+        return (this.sendPost(url, content.toString(), contentType, headers));
     }
 
     public @NotNull RequestResponse sendPost(@NotNull final String url,
@@ -239,16 +238,18 @@ public class HttpClientSessionBasic implements HttpClientSession {
      $      FORM
      */
 
-    public @NotNull RequestResponse sendForm(@NotNull String url,
-                                             @NotNull List<NameValuePair> form) throws IOException,
+    public final @NotNull RequestResponse sendForm(@NotNull final String url,
+                                                   @NotNull final List<NameValuePair> form) throws IOException,
             HttpClientException,
             HttpServerException {
-        return (sendForm(url, form, getRequestConfig().build()));
+        return (this.sendForm(url, form, getRequestConfig().build()));
     }
 
-    public @NotNull RequestResponse sendForm(@NotNull String url,
-                                             @NotNull List<NameValuePair> form,
-                                             @NotNull RequestConfig requestConfig) throws IOException,
+    // FORM
+
+    public @NotNull RequestResponse sendForm(@NotNull final String url,
+                                             @NotNull final List<NameValuePair> form,
+                                             @NotNull final RequestConfig requestConfig) throws IOException,
             HttpClientException,
             HttpServerException {
         Date start = new Date();
@@ -267,9 +268,12 @@ public class HttpClientSessionBasic implements HttpClientSession {
         return (new RequestResponse(httpResponse, start));
     }
 
-    public @NotNull RequestResponse sendDelete(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
-        Date start = new Date();
-        String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
+    // DELETE
+
+    public final @NotNull RequestResponse sendDelete(@NotNull final String url) throws IOException,
+            HttpClientException, HttpServerException {
+        final Date start = new Date();
+        final String oldCookieStoreSerialized = BasicCookieStoreSerializerUtils.serializableToBase64(httpCookieStore);
 
         HttpDelete httpDelete = new HttpDelete(url);
         httpDelete.setConfig(getRequestConfig().build());
@@ -281,6 +285,8 @@ public class HttpClientSessionBasic implements HttpClientSession {
         verifyCookiesEvents(oldCookieStoreSerialized);
         return (new RequestResponse(httpResponse, start));
     }
+
+    // PUT
 
     public @NotNull RequestResponse sendPut(@NotNull String url, @NotNull String content, @NotNull ContentType contentType) throws IOException, HttpClientException, HttpServerException {
         Date start = new Date();
@@ -311,7 +317,7 @@ public class HttpClientSessionBasic implements HttpClientSession {
      * @throws HttpServerException If the server is not available.
      * @throws IOException If the request is not successful because of an network error.
      */
-    private void assertRequest(HttpResponse httpResponse, Date startDate) throws HttpClientException, HttpServerException, IOException {
+    private final void assertRequest(HttpResponse httpResponse, Date startDate) throws HttpClientException, HttpServerException, IOException {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         if (statusCode >= 500 && statusCode <= 599)
             throw (new HttpServerException(new RequestResponse(httpResponse, startDate)));
@@ -326,7 +332,7 @@ public class HttpClientSessionBasic implements HttpClientSession {
      * This methods should be called after a request.
      * @param serializedOldCookieStore The old cookie store before the request serialized as string.
      */
-    private void verifyCookiesEvents(final String serializedOldCookieStore) {
+    private final void verifyCookiesEvents(final String serializedOldCookieStore) {
         if (HttpClientSessionEvent.countListeners() == 0)
             return;
         try {
@@ -342,23 +348,23 @@ public class HttpClientSessionBasic implements HttpClientSession {
      *      Getters and Setters
      */
 
-    public @NotNull HttpClient getHttpClient() {
+    public final @NotNull HttpClient getHttpClient() {
         return (httpClient);
     }
 
-    public RequestConfig.@NotNull Builder getRequestConfig() {
+    public final RequestConfig.@NotNull Builder getRequestConfig() {
         return (requestConfig);
     }
 
-    public @NotNull BasicCookieStore getHttpCookieStore() {
+    public final @NotNull BasicCookieStore getHttpCookieStore() {
         return (httpCookieStore);
     }
 
-    public long getTimeout() {
+    public final long getTimeout() {
         return (TIMEOUT);
     }
 
-    public void setHttpClient(@NotNull final HttpClient httpClient) {
+    public final void setHttpClient(@NotNull final HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
@@ -367,7 +373,7 @@ public class HttpClientSessionBasic implements HttpClientSession {
      * and push the new cookies from the gived cookie store in the cookie store.
      * @param httpCookieStore the new cookie store to use
      */
-    public void setHttpCookieStore(final BasicCookieStore httpCookieStore) {
+    public final void setHttpCookieStore(final BasicCookieStore httpCookieStore) {
         this.httpCookieStore.clear();
         for (Cookie cookie : httpCookieStore.getCookies()) {
             this.httpCookieStore.addCookie(cookie);
@@ -378,24 +384,24 @@ public class HttpClientSessionBasic implements HttpClientSession {
      * This method return the JsonObject from <a href="https://lumtest.com/echo.json">https://lumtest.com/echo.json</a>.
      * @return The JsonObject from <a href="https://lumtest.com/echo.json">https://lumtest.com/echo.json</a>
      */
-    public @NotNull JSONObject getIpInformation() throws HttpClientException, IOException, HttpServerException {
+    public final @NotNull JSONObject getIpInformation() throws HttpClientException, IOException, HttpServerException {
         final RequestResponse requestResponse = sendGet("https://lumtest.com/echo.json");
         return (requestResponse.toJSONObject());
     }
 
-    public String getUserAgent() {
+    public final String getUserAgent() {
         return (userAgent);
     }
 
-    public void setUserAgent(String userAgent) {
+    public final void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 
-    public @Nullable Object getMetadata() {
+    public final @Nullable Object getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(Object metadata) {
+    public final void setMetadata(Object metadata) {
         this.metadata = metadata;
     }
 }

@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -44,7 +45,7 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
 
     private final Semaphore semaphore;
 
-    private final int MAX_SYNCHRONOUS_REQUEST;
+    private final int maxSynchronousRequest;
 
     /*
      $      Constructor
@@ -54,7 +55,7 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
         try {
             if (maxSynchronousRequest <= 0)
                 throw (new IllegalArgumentException("Max synchronous request cannot be 0 or negative"));
-            this.MAX_SYNCHRONOUS_REQUEST = maxSynchronousRequest;
+            this.maxSynchronousRequest = maxSynchronousRequest;
             this.semaphore = new Semaphore(maxSynchronousRequest);
             this.httpClient = newHttpClient();
             this.requestConfig = setRequestConfig();
@@ -68,7 +69,7 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
         try {
             if (maxSynchronousRequest <= 0)
                 throw (new IllegalArgumentException("Max synchronous request cannot be 0 or negative"));
-            this.MAX_SYNCHRONOUS_REQUEST = maxSynchronousRequest;
+            this.maxSynchronousRequest = maxSynchronousRequest;
             this.semaphore = new Semaphore(maxSynchronousRequest);
             this.config = config;
             this.httpClient = newHttpClient();
@@ -111,15 +112,14 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
          * and avoid the creation of new connections when the HttpClient is used in multiple threads.
          * This is useful when the HttpClient is used in a multithreaded environment.
          */
-        PoolingHttpClientConnectionManager poolingClientConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-        poolingClientConnectionManager.setValidateAfterInactivity((int) (getTimeout() / 2));
-        poolingClientConnectionManager.setMaxTotal(MAX_SYNCHRONOUS_REQUEST);
-        poolingClientConnectionManager.setDefaultMaxPerRoute(MAX_SYNCHRONOUS_REQUEST);
+        PoolingHttpClientConnectionManager poolingClientConnectionManager = null;
+        if (maxSynchronousRequest > 0) {
+            poolingClientConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            poolingClientConnectionManager.setValidateAfterInactivity((int) (getTimeout() / 2));
+            poolingClientConnectionManager.setMaxTotal(maxSynchronousRequest);
+            poolingClientConnectionManager.setDefaultMaxPerRoute(maxSynchronousRequest);
+        }
 
-        /*
-         * Verify if the Bright data proxy is enabled.
-         * If it is enabled, the HttpClient will use the proxy.
-         */
         /*
          * Verify if the Bright data proxy is enabled.
          * If it is enabled, the HttpClient will use the proxy.
@@ -130,7 +130,8 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
                 assert config.getUsername() != null;
                 assert config.getPassword() != null;
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getUsername(), config.getPassword());
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getUsername(),
+                        config.getPassword());
                 credentialsProvider.setCredentials(new AuthScope(brightDataProxy), credentials);
                 httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
             }
@@ -141,9 +142,11 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
          * Build the HttpClient for the client with HttpClientBuilder.
          */
         httpClientBuilder.setDefaultCookieStore(getHttpCookieStore());
-        httpClientBuilder.setConnectionManager(poolingClientConnectionManager);
-        httpClientBuilder.setMaxConnTotal(MAX_SYNCHRONOUS_REQUEST);
-        httpClientBuilder.setMaxConnPerRoute(MAX_SYNCHRONOUS_REQUEST);
+        if (poolingClientConnectionManager != null) {
+            httpClientBuilder.setConnectionManager(poolingClientConnectionManager);
+            httpClientBuilder.setMaxConnTotal(maxSynchronousRequest);
+            httpClientBuilder.setMaxConnPerRoute(maxSynchronousRequest);
+        }
         return (httpClientBuilder.build());
     }
 
@@ -152,35 +155,6 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
      */
 
     // GET
-
-    @Override
-    public @NotNull RequestResponse sendGet(@NotNull String url) throws IOException, HttpClientException, HttpServerException {
-        try {
-            semaphore.acquire();
-            try {
-                return (super.sendGet(url));
-            } finally {
-                semaphore.release();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public @NotNull RequestResponse sendGet(@NotNull final String url,
-                                            @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
-        try {
-            semaphore.acquire();
-            try {
-                return (super.sendGet(url, requestConfig));
-            } finally {
-                semaphore.release();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public @NotNull RequestResponse sendGet(@NotNull final String url,
@@ -203,55 +177,6 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
     @Override
     public @NotNull RequestResponse sendPost(@NotNull final String url,
                                              @NotNull final String content,
-                                             @NotNull final ContentType contentType) throws HttpClientException, IOException, HttpServerException {
-        try {
-            semaphore.acquire();
-            try {
-                return (super.sendPost(url, content, contentType));
-            } finally {
-                semaphore.release();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public @NotNull RequestResponse sendPost(@NotNull final String url,
-                                             @NotNull final JSONObject content,
-                                             @NotNull final ContentType contentType) throws HttpClientException, IOException, HttpServerException {
-        try {
-            semaphore.acquire();
-            try {
-                return (super.sendPost(url, content, contentType));
-            } finally {
-                semaphore.release();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public @NotNull RequestResponse sendPost(@NotNull final String url,
-                                             @NotNull final JSONObject content,
-                                             @NotNull final ContentType contentType,
-                                             @Nullable final List<Header> headers) throws HttpClientException, IOException, HttpServerException {
-        try {
-            semaphore.acquire();
-            try {
-                return (super.sendPost(url, content, contentType, headers));
-            } finally {
-                semaphore.release();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public @NotNull RequestResponse sendPost(@NotNull final String url,
-                                             @NotNull final String content,
                                              @NotNull final ContentType contentType,
                                              @Nullable final List<Header> headers) throws IOException, HttpClientException, HttpServerException {
         try {
@@ -270,43 +195,12 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
 
     @Override
     public @NotNull RequestResponse sendForm(@NotNull final String url,
-                                             @NotNull final List<NameValuePair> form) throws IOException, HttpClientException, HttpServerException {
-        try {
-            semaphore.acquire();
-            try {
-                return (super.sendForm(url, form));
-            } finally {
-                semaphore.release();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public @NotNull RequestResponse sendForm(@NotNull final String url,
                                              @NotNull final List<NameValuePair> form,
                                              @NotNull final RequestConfig requestConfig) throws IOException, HttpClientException, HttpServerException {
         try {
             semaphore.acquire();
             try {
                 return (super.sendForm(url, form, requestConfig));
-            } finally {
-                semaphore.release();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // DELETE
-
-    @Override
-    public @NotNull RequestResponse sendDelete(@NotNull final String url) throws IOException, HttpClientException, HttpServerException {
-        try {
-            semaphore.acquire();
-            try {
-                return (super.sendDelete(url));
             } finally {
                 semaphore.release();
             }
@@ -332,4 +226,7 @@ public class HttpClientSessionAsync extends HttpClientSessionBasic {
             throw new RuntimeException(e);
         }
     }
+
+
+
 }
